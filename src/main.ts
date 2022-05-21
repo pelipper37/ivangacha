@@ -1,7 +1,7 @@
+import { JsonSerializer } from 'typescript-json-serializer';
 import { Game } from './base/Game';
 import { Random, returnTable } from './rng/Engine';
-import { Save } from './base/Save';
-import { StepLog } from './base/StepLog';
+import { Car, Manufacturer } from './test/Car'
 
 function startGame()
 {
@@ -15,14 +15,12 @@ function testEngine(map: returnTable)
   console.log(eng.getRandom());
 }
 
-let save: Save = new Save();
+let car: Car = new Car("ivanmobile", new Manufacturer("billy"));
 
-save.set("ivan", new StepLog("a"));
+let serializer: JsonSerializer = new JsonSerializer();
 
-console.log(save.get("ivan"));
+let string: string = JSON.stringify(serializer.serialize(car));
 
-let ivan: string = JSON.stringify(save);
-console.log(ivan);
+let reserialized: Car = serializer.deserializeObject(car, Car);
 
-let parsedIvan: any = JSON.parse(ivan);
-parsedIvan.get("ivan").step();
+reserialized.honk();
