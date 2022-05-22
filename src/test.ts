@@ -1,3 +1,4 @@
+/*
 import { Game } from './base/Game';
 import { StepLog } from './base/StepLog';
 
@@ -6,14 +7,30 @@ game.addObject(new StepLog(12, "Buenos dias!"));
 game.addObject(new StepLog(2134, "Donde esta la biblioteca?"));
 
 game.start();
+*/
 
-/* Test to check the random output of the random number generator
-import { Random, returnTable } from './rng/Engine';
+///*Test to check the random output of the random number generator
+import { Random, returnTable} from './rng/Engine';
 
-let eng: Random = new Random(map);  
+let map: returnTable<string> = [
+    {
+        weight: 3,
+        returns: "alice",
+    },
+    {
+        weight: 10,
+        returns: "bob",
+    },
+    {
+        weight: 12,
+        returns: "charlie",
+    },
+];
+
+let eng: Random<string> = new Random(map);  
   
 console.log(eng.getRandom());
-*/
+//*/
 
 /* Test to serialize and deserialize a Car object with a nested Manufacturer object
 import { JsonSerializer } from 'typescript-json-serializer';
