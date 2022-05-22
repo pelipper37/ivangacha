@@ -1,0 +1,29 @@
+{
+  "name": "ivangacha",
+  "version": "1.0.0",
+  "description": "we like ivan",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "ts-node src/test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pelipper37/ivangacha.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dderpym/ivangacha/issues"
+  },
+  "homepage": "https://github.com/dderpym/ivangacha#readme",
+  "dependencies": {
+    "@types/node": "^17.0.35",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.6.4",
+    "typescript-json-serializer": "^4.2.0"
+  }
+}
