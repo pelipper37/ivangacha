@@ -34,7 +34,7 @@ export class Random <T>
   }
 
   /**
-   * 
+   * Returns a random number according to the weighted table.
    * @returns {T} A random value according to their weights.
    */
   public getRandom(): T
@@ -54,6 +54,12 @@ export class Random <T>
     }
   }
 
+  /**
+   * Generates a random number
+   * @param {number} min The minimum number of the float
+   * @param {number} max The maximum number of the float
+   * @returns {number} The random number
+   */
   public static randomNumber(min: number, max: number)
   {
     return Math.random() * (max - min) + min;
