@@ -8,7 +8,7 @@ export class Manufacturer
   constructor(
     @JsonProperty('name') name: string
   )
-  { 
+  {
     this.name = name;
   }
 }
@@ -16,7 +16,6 @@ export class Manufacturer
 @JsonObject()
 export class Car
 {
-
   @JsonProperty({name: 'name', type: String, required: true})
   private name: string;
 
