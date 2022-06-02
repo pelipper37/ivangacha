@@ -1,20 +1,21 @@
-import { Steppable } from './Steppable';
+import { table } from 'console';
+import { PriorityQueue } from '../util/Queue';
+import Task from './Task';
 
 const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export class Game
 {
   private static instance: Game;
-  private stepTime: number;
-  private firstNode: Steppable;
-  private lastNode: Steppable;
+  private queue: PriorityQueue;
+  private repeatableTasks: Task[];
 
   /** 
    * Creates a Game object
    * @param {number} stepTime The amount of time (in milliseconds) between each step()
    * @param {Steppable} init The first node in the GameObject
    */
-  private constructor (stepTime: number, init: Steppable)
+  private constructor (stepTime: number)
   {
     this.stepTime = stepTime;
     this.firstNode = init;
@@ -28,82 +29,52 @@ export class Game
    * 
    * @returns {Game} The Game singleton
    */
-  public static init(stepTime: number, steppable: Steppable): Game
+  public static init(stepTime: number): Game
   {
-    Game.instance =  new Game(stepTime, steppable);
+    Game.instance =  new Game(stepTime);
 
-    return Game.instance;
-  }
-
-  /** 
-   * Gets the Game singleton object
-   * 
-   * @returns {Game} The Game singleton
-   */
-  public static getInstance(): Game
-  {
     return Game.instance;
   }
 
   /**
-   * @param {Steppable} steppable A steppable object to put on the queue
+   * Queues a task to be executed next step.
    * 
-   * @returns {Game} The game object being acted on
+   * @param { Task } task The task to be excuted
+   * @param { number } priority The priority of the task
    */
-  public addObject(steppable: Steppable): Game
+  public queueTask(task: Task, priority: number)
   {
-    let curNode: Steppable = this.firstNode;
-    let nextNode: Steppable = this.firstNode.getNext();
-    let priority: number = steppable.getPriority();
-
-    if (curNode.lowerThan(priority))
-    {
-      this.firstNode = steppable;
-      steppable.setNext(curNode);
-      return this;
-    }
-
-    while(true)
-    {
-      if (nextNode == null || nextNode.lowerThan(priority)) //if it's at the last node, or if the nextNode has a lower priority then
+    this.queue.insert(
       {
-        //insert the node between the current and the next
-        curNode.setNext(steppable);
-        steppable.setNext(nextNode);
-
-        break;
+        getPriority: () => priority,
+        value: task,
       }
-
-      curNode = nextNode;
-      nextNode = curNode.getNext();
-    }
-    
-    return this;
+    );
   }
 
   /**
-   * Moves the game one step further
+   * Adds a task to be repeated every game step.
+   * 
+   * @param { Task } repeatableTask The task to be re-queued every game step.
    */
-  private step(): void
+  public addRepeatableTask(repeatableTask: Task)
   {
-    let nextNode: Steppable = this.firstNode;
-    while (nextNode != null)
-    {
-        nextNode.step();
-        nextNode = nextNode.getNext();
-    }
+    this.repeatableTasks.push(repeatableTask);
   }
 
   /**
-   * Begins execution of the game object
-   * @async
+   * Removes a repeating task from being executed every game step.
+   * 
+   * @param { Task } repeatableTask The task to be removed from being re-queued.
+   * @param { boolean } deleteFromQueue Whether to remove the task from the next immediate queue or not, defaults to true.
+   * 
    */
-  public async start(): Promise<void>
+  public removeRepeatableTask(repeatableTask: Task, deleteFromQueue: boolean = true)
   {
-    while(true)
-    {
-      this.step();
-      await wait(this.stepTime);
-    }
+    let rTasks = this.repeatableTasks;
+    rTasks.splice(rTasks.indexOf(repeatableTask), 1);
+
+    if (deleteFromQueue)
+      this.queue.remove(repeatableTask);
   }
 }

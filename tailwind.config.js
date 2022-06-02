@@ -1,7 +1,8 @@
 module.exports = {
   content: ["./build/index.html"],
   theme: {
-    extend: {},
+    colors: {},
+    extends: {},
   },
   plugins: [],
 }
