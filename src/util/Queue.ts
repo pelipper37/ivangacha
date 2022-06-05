@@ -44,18 +44,10 @@ export interface Prioritizable {
 export class PriorityQueue<T extends Prioritizable> {
     private nodes: T[]; //represents the tree compressed onto an array.
 
-    /**
-     * Creates a priority queue.
-     * @param { T[] } nodes The already max-heapified array that represents the binary heap
-     */
     private constructor(nodes: T[]) {
         this.nodes = nodes;
     }
 
-    /**
-     * Creates an empty queue
-     * @returns { PriorityQueue } An empty queue
-     */
     public static createEmpty<U extends Prioritizable>() {
         return new PriorityQueue<U>([]);
     }
@@ -142,10 +134,6 @@ export class PriorityQueue<T extends Prioritizable> {
         return new PriorityQueue<U>(nodes);
     }
 
-    /**
-     * Inserts a node into the heap
-     * @param { T } node The node to be inserted
-     */
     public insert(node: T)
     {
         let nodes = this.nodes;
@@ -187,10 +175,6 @@ export class PriorityQueue<T extends Prioritizable> {
         return head;
     }
 
-    /**
-     * Removes an element form the PriorityQueue
-     * @param { T } node The node to remove.
-     */
     public remove(node: T)
     {
         let nodes = this.nodes;
