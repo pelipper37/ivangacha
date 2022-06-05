@@ -23,46 +23,58 @@ console.log(eng.getRandom());
 */
 /* Test to serialize and deserialize a Car object with a nested Manufacturer object
 import { JsonSerializer } from 'typescript-json-serializer';
-import { Car, Manufacturer } from './test/Car'
+import Player from './base/Player';
 
-let car: Car = new Car("ivanmobile", new Manufacturer("billy"));
+let car: Player = new Player("Ivan the Great");
 
 let serializer: JsonSerializer = new JsonSerializer();
 
 let string: string = JSON.stringify(serializer.serialize(car));
 
-let reserialized: Car = serializer.deserializeObject(car, Car);
+let reserialized: Player = serializer.deserializeObject(string, Player);
 
-reserialized.honk();
+console.log(reserialized.getName());
 */
 
+///* Tests the queue system built into game
+import { Game } from "./base/Game";
+import Task from "./base/Task";
 
-import { Prioritizable, PriorityQueue } from "./util/Queue";
 
-let q: Prioritizable[] = [];
-
-for ( let i = 0; i < 7; ++i )
+let task1: Task =
 {
-    q.push(
-        {
-            getPriority: () => i,
-            value: i,
-        }
-    );
+    name: "foogleboogle-defense",
+    getPriority: () => 1000,
+    execute: () =>{
+        console.log("Erasing foogleboogles...");
+        return 0;
+    }
 }
 
-let node = 
-    {
-        getPriority: () => 5,
-        value: 5,
-    }
+let task2: Task = 
+{
+    name: "wood-generator-01",
+    getPriority: () => 3,
+    execute: () =>{
+        console.log("Generated 1 wood!");
+        return 0;
+    },
+}
 
-q.push(node);
+let task3: Task = 
+{
+    name: "foogleboogle-repair",
+    getPriority: () => 900,
+    execute: () =>{
+        console.log("Fixing damages from foogleboogles...");
+        return 0;
+    },
+}
 
-let queue: PriorityQueue = PriorityQueue.createFromArray(q);
+let game: Game = Game.init(1000, [], [task2, task3]);
 
-console.log(queue);
+game.queueTask(task1);
 
-queue.remove(node);
+game.activateSystems();
 
-console.log(queue);
+//*/
