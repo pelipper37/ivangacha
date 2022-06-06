@@ -1,15 +1,5 @@
-/*
-import { Game } from './base/Game';
-import { StepLog } from './base/StepLog';
 
-let game: Game = Game.init(1000, new StepLog(100, "Hola, mi amigo!"));
-game.addObject(new StepLog(12, "Buenos dias!"));
-game.addObject(new StepLog(2134, "Donde esta la biblioteca?"));
-
-game.start();
-*/
-
-///*Test to check the random output of the random number generator
+/*Test to check the random output of the random number generator
 import { Random, returnTable} from './rng/Engine';
 
 let map: returnTable<string> = [
@@ -30,19 +20,61 @@ let map: returnTable<string> = [
 let eng: Random<string> = new Random(map);  
   
 console.log(eng.getRandom());
-//*/
-
+*/
 /* Test to serialize and deserialize a Car object with a nested Manufacturer object
 import { JsonSerializer } from 'typescript-json-serializer';
-import { Car, Manufacturer } from './test/Car'
+import Player from './base/Player';
 
-let car: Car = new Car("ivanmobile", new Manufacturer("billy"));
+let car: Player = new Player("Ivan the Great");
 
 let serializer: JsonSerializer = new JsonSerializer();
 
 let string: string = JSON.stringify(serializer.serialize(car));
 
-let reserialized: Car = serializer.deserializeObject(car, Car);
+let reserialized: Player = serializer.deserializeObject(string, Player);
 
-reserialized.honk();
+console.log(reserialized.getName());
 */
+
+///* Tests the queue system built into game
+import { Game } from "./base/Game";
+import Task from "./base/Task";
+
+
+let task1: Task =
+{
+    name: "foogleboogle-defense",
+    getPriority: () => 1000,
+    execute: () =>{
+        console.log("Erasing foogleboogles...");
+        return 0;
+    }
+}
+
+let task2: Task = 
+{
+    name: "wood-generator-01",
+    getPriority: () => 3,
+    execute: () =>{
+        console.log("Generated 1 wood!");
+        return 0;
+    },
+}
+
+let task3: Task = 
+{
+    name: "foogleboogle-repair",
+    getPriority: () => 900,
+    execute: () =>{
+        console.log("Fixing damages from foogleboogles...");
+        return 0;
+    },
+}
+
+let game: Game = Game.init(1000, [], [task2, task3]);
+
+game.queueTask(task1);
+
+game.activateSystems();
+
+//*/

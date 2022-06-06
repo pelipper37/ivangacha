@@ -1,109 +1,95 @@
-import { Steppable } from './Steppable';
+import { PriorityQueue } from '../util/Queue';
+import { wait } from '../util/wait';
+import Task from './Task';
 
-const wait = (ms: number) => new Promise(res => setTimeout(res, ms));
-
-export class Game
-{
+export class Game {
   private static instance: Game;
+
   private stepTime: number;
-  private firstNode: Steppable;
-  private lastNode: Steppable;
+  private running: boolean = false;
+  private queue: PriorityQueue<Task>;
+  private repeatableTasks: Task[];
 
   /** 
-   * Creates a Game object
    * @param {number} stepTime The amount of time (in milliseconds) between each step()
-   * @param {Steppable} init The first node in the GameObject
+   * @param { Task[] } tasks  The tasks to execute immediately
+   * @param { Task[] } repeatableTasks The tasks to be executed repeatedly
    */
-  private constructor (stepTime: number, init: Steppable)
+  private constructor(stepTime: number, tasks: Task[] = [], repeatableTasks: Task[] = [])
   {
     this.stepTime = stepTime;
-    this.firstNode = init;
-    this.lastNode = init;
+    this.queue = PriorityQueue.heapify<Task>(tasks);
+    this.repeatableTasks = repeatableTasks;
   }
 
   /** 
-   * Initializes the Game singleton
    * @param {number} stepTime The amount of time (in milliseconds) between each step()
-   * @param {Steppable} steppable The first node in the GameObject
+   * @param { Task[] } tasks  The tasks to execute immediately
+   * @param { Task[] } repeatableTasks The tasks to be executed repeatedly
    * 
    * @returns {Game} The Game singleton
    */
-  public static init(stepTime: number, steppable: Steppable): Game
+  public static init(stepTime: number, tasks: Task[] = [], repeatableTasks: Task[] = []): Game
   {
-    Game.instance =  new Game(stepTime, steppable);
+    Game.instance = new Game(stepTime, tasks, repeatableTasks);
 
     return Game.instance;
   }
 
-  /** 
-   * Gets the Game singleton object
-   * 
-   * @returns {Game} The Game singleton
-   */
-  public static getInstance(): Game
+  public queueTask(task: Task): void
   {
-    return Game.instance;
+    this.queue.insert(task);
   }
 
-  /**
-   * @param {Steppable} steppable A steppable object to put on the queue
-   * 
-   * @returns {Game} The game object being acted on
-   */
-  public addObject(steppable: Steppable): Game
+  public addRepeatableTask(repeatableTask: Task): void
   {
-    let curNode: Steppable = this.firstNode;
-    let nextNode: Steppable = this.firstNode.getNext();
-    let priority: number = steppable.getPriority();
+    this.repeatableTasks.push(repeatableTask);
+  }
 
-    if (curNode.lowerThan(priority))
-    {
-      this.firstNode = steppable;
-      steppable.setNext(curNode);
-      return this;
+  public removeRepeatableTask(repeatableTask: Task): void
+  {
+    let rTasks = this.repeatableTasks;
+    rTasks.splice(rTasks.indexOf(repeatableTask), 1);
+  }
+
+  public async activateSystems(): Promise<void>
+  {
+    if (this.running) {
+      return;
     }
 
-    while(true)
-    {
-      if (nextNode == null || nextNode.lowerThan(priority)) //if it's at the last node, or if the nextNode has a lower priority then
-      {
-        //insert the node between the current and the next
-        curNode.setNext(steppable);
-        steppable.setNext(nextNode);
+    this.running = true;
 
-        break;
+    let queue = this.queue;
+    let repeatableTasks = this.repeatableTasks;
+
+    function executeTasks(): void {
+      let current = queue.pop();
+
+      while (current) {
+        current.execute();
+        current = queue.pop();
       }
-
-      curNode = nextNode;
-      nextNode = curNode.getNext();
     }
-    
-    return this;
-  }
 
-  /**
-   * Moves the game one step further
-   */
-  private step(): void
-  {
-    let nextNode: Steppable = this.firstNode;
-    while (nextNode != null)
-    {
-        nextNode.step();
-        nextNode = nextNode.getNext();
+    function queueRepeatableTasks(): void {
+      for (let i = 0; i < repeatableTasks.length; ++i) {
+        this.queueTask(repeatableTasks[i]);
+      }
     }
-  }
 
-  /**
-   * Begins execution of the game object
-   * @async
-   */
-  public async start(): Promise<void>
-  {
-    while(true)
-    {
-      this.step();
+    while (true) {
+      if (!this.running) break;
+
+      queueRepeatableTasks();
+      executeTasks();
+
       await wait(this.stepTime);
     }
+  }
+
+  public async deactivateSystems(): Promise<void>
+  {
+    this.running = false;
   }
 }
